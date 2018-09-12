@@ -1,0 +1,21 @@
+p {
+  text-align: left;
+}
+
+.reveal h1 {
+  font-weight: bolder;
+}
+
+.reveal h2, .reveal h3 {
+  color: #21908CFF;
+  font-weight: bold;
+}
+
+.reveal strong, .reveal b {
+  color:  #440154FF;
+  font-weight: bolder;
+}
+
+img-std {
+  width: 600px;
+}

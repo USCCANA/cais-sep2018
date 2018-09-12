@@ -1,0 +1,219 @@
+---
+title: "Overview of Social Network Models"
+author: "George G. Vega Yon<br><img src=\"cana_logo_400x400px.jpeg\" style=\"width:200px;height:200px;border:0px;box-shadow:none;\"><br>Center for Applied Network Analysis (CANA)<br>Department of Preventive Medicine"
+date: "September 5, 2018"
+output:
+  revealjs::revealjs_presentation:
+    self_contained: true
+    transition: fade
+    theme: simple
+    reveal_options:
+      controls: false
+      slideNumber: true
+      margin: 0.05
+      width: 1024
+      height: 780
+    css: "slides.css"
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, fig.width=6,
+  fig.align = "center"
+  )
+```
+
+
+## Context: Identifying Contagion in Networks {.smaller}
+
+*   Ideally we would like to run a model in the form of 
+    $$
+    Y_i = f\left(X_i, Y_{-i}, G\right)
+    $$
+    
+    where $Y_{-i}$ is the behavior of individuals other than $i$ and $G$ is
+    a graph.
+    
+*   The problem: So far, traditional statistical models won't work, why?
+    because most of them rely on having IID. e.g
+    
+    1.  In OLS $\varepsilon_i$ must be IID, otherwise $E[X\varepsilon]\neq 0$
+    2.  In MLE (logit, probit, Survival analysis, etc.) must have IID
+        in order to build the likelihood, otherwise will be optimizing a
+        wrong log-likelihood.
+        
+    In both cases, contagion estimators will be biased. 
+    
+    
+## Spatial Autocorrelation Models (SAR a.k.a. Network Auto-correlation Models) {.smaller}
+
+*   Spatial Autocorrelation Models are mostly applied in the context of spatial
+    statistics and econometrics.
+    
+*   The core part of these model lies on specifying a grid and thus generating
+    a network. Such network is then represented as an adjancency matrix with
+    row sums equal to 1.
+    
+*   The spatial autocorrelation model explicitly builds the autocorrelatation of
+    a graph (a network) as follows
+    
+    $$
+    \begin{align}
+    Y = & \alpha + \rho W Y + X\beta + \varepsilon,\quad\varepsilon\sim MVN(0,\sigma^2I_n) \\
+    \implies & Y = \left(I_n -\rho W\right)^{-1}(\alpha + X\beta + \varepsilon)
+    \end{align}
+    $$
+
+    Where $\rho\in[-1,1]$ and $W=\{w_{ij}\}$, with $\sum_j w_{ij} = 1$
+
+## Spatial Autocorrelation Models (SAR) (cont.) {.smaller}
+
+*   This is more close than we might think, since the $i$-th element of $Wy$ can be
+    expressed as $\frac{\sum_j a_{ij} y_j}{\sum_j a_{ij}}$, what we usually
+    define as exposure in networks, where $a_{ij}$ is an element of the $\{0,1\}$-adjacency
+    matrix .
+    
+*   Notice that $(I_n - \rho W)^{-1} = I_n - \rho W - \rho^2 W^2 - \dots$, hence
+    there autocorrelation does consider effects over neighbors farther than 1 step
+    away, which makes the specification of $W$ no critical. [see @LeSage2008]
+    
+*   These models assume that $W$ is exogenous,
+    in other words, if there's homophily you won't be able to use it!
+
+## General overview {.smaller}
+
+*   __Problem__ Homophily can be confounded with contagion
+
+*   Generically, if we observe homophily in a network, there is a set of variables
+    $Z_i$ that partly generated the graph $G$.
+    
+*   Furthermore, that same variable $Z_i$ may have generated the behavior $Y_i$,
+    hence, if we project $Y_i$ onto $G$ (regression model or other model using
+    exposure) we will see an association between the two of them.
+    
+*   Such association will be __spurious__ since comes throught $Z_i$, and is not a
+    direct effect of $G$ over $Y$. [see @Shalizi2011]
+    
+*   __Solution__ [according to @Aral2009] Use propensity score matching,
+    to rule out homophily-based contagion. First, lets take a look at the
+    Rubin Causal Model.
+    
+
+## Exponential Random Graph Models (ERGMs)
+
+The distribution of $\mathbf{Y}$ can be parameterized in the form
+
+$$
+\Pr\left(\mathbf{Y}=\mathbf{y}|\theta, \mathcal{Y}\right) = \frac{\exp{\theta^{\mbox{T}}\mathbf{g}(\mathbf{y})}}{\kappa\left(\theta, \mathcal{Y}\right)},\quad\mathbf{y}\in\mathcal{Y}
+(\#eq:04-1)
+$$
+
+Where $\theta\in\Omega\subset\mathbb{R}^q$ is the vector of model coefficients and $\mathbf{g}(\mathbf{y})$ is a *q*-vector of statistics based on the adjacency matrix $\mathbf{y}$.
+
+---
+
+Model \@ref(eq:04-1) may be expanded by replacing $\mathbf{g}(\mathbf{y})$ with $\mathbf{g}(\mathbf{y}, \mathbf{X})$ to allow for additional covariate information $\mathbf{X}$ about the network. The denominator,
+
+
+$$
+\kappa\left(\theta,\mathcal{Y}\right) = \sum_{\mathbf{z}\in\mathcal{Y}}\exp{\theta^{\mbox{T}}\mathbf{g}(\mathbf{z})}
+$$
+
+Is the normalizing factor that ensures that equation \@ref(eq:04-1) is a legitimate probability distribution. Even after fixing $\mathcal{Y}$ to be all the networks that have size $n$, the size of $\mathcal{Y}$ makes this type of models hard to estimate as there are $N = 2^{n(n-1)}$ possible networks! [@Hunter2008]
+
+
+## Separable Exponential Random Graph Models (a.k.a. TERGMs)
+
+-   A discrete time model.
+
+-   Estimates a set of parameters $\theta = \{\theta^-, \theta^+\}$ that capture the transition dynamics from $\mathbf{Y}^{t-1}$ to $\mathbf{Y}^{t}$.
+
+-   Assuming that $(\mathbf{Y}^+\perp\mathbf{Y}^-) | \mathbf{Y}^{t-1}$ (the model **dynamic model** is separable), we estimate two models:
+    $$
+    \begin{align}
+    \Pr\left(\mathbf{Y}^+ = \mathbf{y}^+|\mathbf{Y}^{t-1} = \mathbf{y}^{t-1};\theta^+\right),\quad \mathbf{y}^+\in\mathcal{Y}^+(\mathbf{y}^{t-1})\\
+    \Pr\left(\mathbf{Y}^- = \mathbf{y}^-|\mathbf{Y}^{t-1} = \mathbf{y}^{t-1};\theta^-\right),\quad \mathbf{y}^-\in\mathcal{Y}^-(\mathbf{y}^{t-1})
+    \end{align}
+    $$
+
+    
+## Latent Network Models
+
+-   Social networks are a function of a latent space (literally, xyz for example) $\mathbf{Z}$.
+
+-   Besides of estimating the typical set of parameters $\theta$, a key part of this model is find $\mathbf{Z}$.
+
+-   Similar to TERGMs, under the conditional independence assumption we can estimate:
+
+$$
+\Pr\left(\mathbf{Y} =\mathbf{y}|\mathbf{X} = \mathbf{x}, \mathbf{Z}, \theta\right) = \prod_{i\neq j}\Pr\left(y_{ij}|z_i, z_j, x_{ij},\theta\right)
+$$
+
+See @hoff2002
+
+## Estimation of ERGMs
+
+In `statnet`, the default estimation method is based on a method proposed by @Geyer1992, Markov-Chain MLE, which uses Markov-Chain Monte Carlo for simulating networks and a modified version of the Newton-Raphson algorihm to do the paremeter estimation part. In general terms, the MC-MLE algorithm can be described as follows:
+
+1.  Initialize the algorithm with an initial guess of $\theta$, call it $\theta^{(t)}$
+
+2.  While (no convergence) do:
+    
+    a.  Using $\theta^{(t)}$, simulate $M$ networks by means of small changes in the $\mathbf{Y}_{obs}$ (the observed network). This part is done by using an importance-sampling method which weights each proposed network by it's likelihood conditional on $\theta^{(t)}$
+    
+    b.  With the networks simulated, we can do the Newton step to update the parameter $\theta^{(t)}$ (this is the iteration part in the `ergm` package): $\theta^{(t)}\to\theta^{(t+1)}$
+    
+    c.  If convergence has been reach (which usually means that $\theta^{(t)}$ and $\theta^{(t + 1)}$ are not very different), then stop, otherwise, go to step a.
+
+For more details see @lusher2012;@admiraal2006;@Snijders2002;@Wang2009 provides details on the algorithm used by PNet (which is the same as the one used in `RSiena`). @lusher2012 provides a short discussion on differences between `ergm` and `PNet`. 
+
+## Actor Autocorrelation Model
+
+## Stochastic Actor Oriented Models (SOAMs a.k.a. Siena)
+
+Stochastic Actor Oriented Models (SOAM), also known as Siena models were introduced by CITATION NEEDED.
+
+As a difference from ERGMs, Siena models look at the data generating process from the individuals' point of view. Based on McFadden's ideas of probabilistic choice, the model is founded in the following equation
+
+$$
+U_i(x) - U_i(x') \sim \mbox{Extreame Value Distribution}
+$$
+
+In other words, individuals choose between states $x$ and $x'$ in a probabilistic way (with some noise),  
+
+$$
+\frac{\exp{f_i^Z(\beta^z,x, z)}}{\sum_{Z'\in\mathcal{C}}\exp{f_i^{Z}(\beta, x, z')}}
+$$
+
+snijders_(sociological methodology 2001)
+
+[@Snijders2010, @lazega2015, @Ripley2011]
+
+## Network Matching: Aral et al. (2009)
+
+*   While we don't observe a particular "exposed/not exposed" treatment variable,
+    we can generate such using a threshold.
+    
+*   In the paper, for each time period $j$, for each level of exposure $j$, they
+    define $W_{ijt} = 1\{e_{it}\geq j\}$ ($T_{it}$ in their notation). Hence, for
+    example, if $e_{it}=3$ (# of friends who adopted at time $t$) and $j=2$, then
+    $T_{it} = 1$.
+    
+*   In the paper they have
+    $\left(\mbox{Exposure levels}\right)\times\left(\mbox{Time points}\right)$
+    treatments.
+    
+*   They did applied the same method using time windows instead (not discussed
+    here).
+
+## Other Models
+
+-   GERGM: Generalized Exponential Random Graph Models (using weighted graphs, see @Desmarais2012).
+
+-   SERGMs: **Statistical** Exponential Random Graph Models, suitable for large graphs, uses sufficient statistics.
+[see @Chandrasekhar2012]
+
+-   DyNAM: dynamic network actor models [see @Stadtfeld2017].
+
+## References {style="font-size:12px"}
