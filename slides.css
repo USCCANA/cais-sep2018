@@ -3,12 +3,12 @@ p {
 }
 
 .reveal h1 {
-  font-weight: bolder;
+  font-weight: bold;
 }
 
 .reveal h2, .reveal h3 {
   color: #21908CFF;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 .reveal strong, .reveal b {

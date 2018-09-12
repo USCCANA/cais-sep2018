@@ -1,6 +1,6 @@
 ---
 title: "Overview of Social Network Models"
-author: "George G. Vega Yon<br><img src=\"cana_logo_400x400px.jpeg\" style=\"width:200px;height:200px;border:0px;box-shadow:none;\"><br>Center for Applied Network Analysis (CANA)<br>Department of Preventive Medicine"
+author: "George G. Vega Yon<br><a href=\"https://ggvy.cl\" target=\"_blank\" style=\"color: black;\">ggvy.cl</a><br><br>Center for Applied Network Analysis (CANA)<br>Department of Preventive Medicine"
 date: "September 5, 2018"
 output:
   revealjs::revealjs_presentation:
@@ -25,25 +25,36 @@ knitr::opts_chunk$set(
 ```
 
 
+## Models for Social Networks
+
+Today, we will take a brief (very brief) look at the following models:
+
+- Spatial Autocorrelation Models
+
+- Exponential Random Graph Models
+
+- Stochastic Actor Oriented Models
+
+- Network Matching
+
+First, a bried introduction
+
 ## Context: Identifying Contagion in Networks {.smaller}
 
-*   Ideally we would like to run a model in the form of 
+*   Ideally we would like to estimate a model in the form of 
     $$
-    Y_i = f\left(X_i, Y_{-i}, G\right)
+    Y_i = f\left(X_i, Y_{-i}, \mathbf{G}; \theta\right)
     $$
     
-    where $Y_{-i}$ is the behavior of individuals other than $i$ and $G$ is
+    where $Y_{-i}$ is the behavior of individuals other than $i$ and $\mathbf{G}$ is
     a graph.
     
 *   The problem: So far, traditional statistical models won't work, why?
-    because most of them rely on having IID. e.g
+    because most of them rely on having IID observations.
     
-    1.  In OLS $\varepsilon_i$ must be IID, otherwise $E[X\varepsilon]\neq 0$
-    2.  In MLE (logit, probit, Survival analysis, etc.) must have IID
-        in order to build the likelihood, otherwise will be optimizing a
-        wrong log-likelihood.
-        
-    In both cases, contagion estimators will be biased. 
+*   Moreover, "Homophily and Contagion Are Generically Confounded" [@Shalizi2011]
+
+*   This has lead to the development of an important collection of statistical models for social networks.
     
     
 ## Spatial Autocorrelation Models (SAR a.k.a. Network Auto-correlation Models) {.smaller}
@@ -80,25 +91,6 @@ knitr::opts_chunk$set(
     
 *   These models assume that $W$ is exogenous,
     in other words, if there's homophily you won't be able to use it!
-
-## General overview {.smaller}
-
-*   __Problem__ Homophily can be confounded with contagion
-
-*   Generically, if we observe homophily in a network, there is a set of variables
-    $Z_i$ that partly generated the graph $G$.
-    
-*   Furthermore, that same variable $Z_i$ may have generated the behavior $Y_i$,
-    hence, if we project $Y_i$ onto $G$ (regression model or other model using
-    exposure) we will see an association between the two of them.
-    
-*   Such association will be __spurious__ since comes throught $Z_i$, and is not a
-    direct effect of $G$ over $Y$. [see @Shalizi2011]
-    
-*   __Solution__ [according to @Aral2009] Use propensity score matching,
-    to rule out homophily-based contagion. First, lets take a look at the
-    Rubin Causal Model.
-    
 
 ## Exponential Random Graph Models (ERGMs)
 
@@ -154,7 +146,11 @@ See @hoff2002
 
 ## Estimation of ERGMs
 
-In `statnet`, the default estimation method is based on a method proposed by @Geyer1992, Markov-Chain MLE, which uses Markov-Chain Monte Carlo for simulating networks and a modified version of the Newton-Raphson algorihm to do the paremeter estimation part. In general terms, the MC-MLE algorithm can be described as follows:
+In `statnet`, the default estimation method is based on a method proposed by @Geyer1992, Markov-Chain MLE, which uses Markov-Chain Monte Carlo for simulating networks and a modified version of the Newton-Raphson algorihm to do the paremeter estimation part.
+
+## Estimation of ERGMs (cont' d) {style="font-size:25px"}
+
+In general terms, the MC-MLE algorithm can be described as follows:
 
 1.  Initialize the algorithm with an initial guess of $\theta$, call it $\theta^{(t)}$
 
@@ -168,27 +164,23 @@ In `statnet`, the default estimation method is based on a method proposed by @Ge
 
 For more details see @lusher2012;@admiraal2006;@Snijders2002;@Wang2009 provides details on the algorithm used by PNet (which is the same as the one used in `RSiena`). @lusher2012 provides a short discussion on differences between `ergm` and `PNet`. 
 
-## Actor Autocorrelation Model
+## Stochastic Actor Oriented Models (SOAMs) {style="font-size:30px"}
 
-## Stochastic Actor Oriented Models (SOAMs a.k.a. Siena)
+-   Also known as Siena: Simulation Investigation for Empirical Network Analysis.
 
-Stochastic Actor Oriented Models (SOAM), also known as Siena models were introduced by CITATION NEEDED.
+-   Models both, structure and behavior as a time-continuous markov process where changes happen one at a time.
 
-As a difference from ERGMs, Siena models look at the data generating process from the individuals' point of view. Based on McFadden's ideas of probabilistic choice, the model is founded in the following equation
+-   In other words, individuals choose between states $x$ and $x'$ in which either a tie changes, or their behavior changes.
 
-$$
-U_i(x) - U_i(x') \sim \mbox{Extreame Value Distribution}
-$$
-
-In other words, individuals choose between states $x$ and $x'$ in a probabilistic way (with some noise),  
+-   Ultimately, we maximize the following function:
 
 $$
 \frac{\exp{f_i^Z(\beta^z,x, z)}}{\sum_{Z'\in\mathcal{C}}\exp{f_i^{Z}(\beta, x, z')}}
 $$
 
-snijders_(sociological methodology 2001)
+-   Like ERGMs, the denominator is what makes estimating this models hard.
 
-[@Snijders2010, @lazega2015, @Ripley2011]
+See @Snijders2010;@lazega2015;@Ripley2011.
 
 ## Network Matching: Aral et al. (2009)
 
@@ -216,4 +208,10 @@ snijders_(sociological methodology 2001)
 
 -   DyNAM: dynamic network actor models [see @Stadtfeld2017].
 
-## References {style="font-size:12px"}
+-   REM: Relational Event Models [see @Butts2008], which are very similar to DyNAMs.
+
+-   ALAAM: Autologistic actor attribute models [see @Daraganova2013;@Kashima2013]
+
+Some other models can be found in @Snijders2011.
+
+## References {style="font-size:10px"}
