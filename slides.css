@@ -2,6 +2,9 @@ p {
   text-align: left;
 }
 
+code {
+  color: indigo;
+}
 .reveal h1 {
   font-weight: bold;
 }
