@@ -1,7 +1,7 @@
 ---
 title: "Overview of Social Network Models"
 author: "George G. Vega Yon<br><a href=\"https://ggvy.cl\" target=\"_blank\" style=\"color: black;\">ggvy.cl</a><br><br>Center for Applied Network Analysis (CANA)<br>Department of Preventive Medicine"
-date: "September 5, 2018"
+date: "September 12, 2018"
 output:
   revealjs::revealjs_presentation:
     self_contained: true
@@ -83,7 +83,7 @@ First, a brief introduction
     define as exposure in networks, where $a_{ij}$ is an element of the $\{0,1\}$-adjacency
     matrix .
     
-*   Notice that $(I_n - \rho W)^{-1} = I_n - \rho W - \rho^2 W^2 - \dots$, hence
+*   Notice that $(I_n - \rho W)^{-1} = I_n + \rho W + \rho^2 W^2 + \dots$, hence
     there autocorrelation does consider effects over neighbors farther than 1 step
     away, which makes the specification of $W$ no critical. [see @LeSage2008]
     

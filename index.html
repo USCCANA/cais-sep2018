@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="George G. Vega Yon ggvy.cl  Center for Applied Network Analysis (CANA) Department of Preventive Medicine" />
+  <meta name="dcterms.date" content="2018-09-12" />
   <title>Overview of Social Network Models</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -489,7 +490,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <section>
     <h1 class="title">Overview of Social Network Models</h1>
     <h2 class="author">George G. Vega Yon<br><a href="https://ggvy.cl" target="_blank" style="color: black;">ggvy.cl</a><br><br>Center for Applied Network Analysis (CANA)<br>Department of Preventive Medicine</h2>
-    <h3 class="date">September 5, 2018</h3>
+    <h3 class="date">September 12, 2018</h3>
 </section>
 
 <section id="models-for-social-networks" class="slide level2">
@@ -534,7 +535,7 @@ Y = &amp; \alpha + \rho W Y + X\beta + \varepsilon,\quad\varepsilon\sim MVN(0,\s
 <h2>Spatial Autocorrelation Models (SAR) (cont.)</h2>
 <ul>
 <li><p>This is more close than we might think, since the <span class="math inline">\(i\)</span>-th element of <span class="math inline">\(Wy\)</span> can be expressed as <span class="math inline">\(\frac{\sum_j a_{ij} y_j}{\sum_j a_{ij}}\)</span>, what we usually define as exposure in networks, where <span class="math inline">\(a_{ij}\)</span> is an element of the <span class="math inline">\(\{0,1\}\)</span>-adjacency matrix .</p></li>
-<li><p>Notice that <span class="math inline">\((I_n - \rho W)^{-1} = I_n - \rho W - \rho^2 W^2 - \dots\)</span>, hence there autocorrelation does consider effects over neighbors farther than 1 step away, which makes the specification of <span class="math inline">\(W\)</span> no critical. <span class="citation" data-cites="LeSage2008">(see LeSage 2008)</span></p></li>
+<li><p>Notice that <span class="math inline">\((I_n - \rho W)^{-1} = I_n + \rho W + \rho^2 W^2 + \dots\)</span>, hence there autocorrelation does consider effects over neighbors farther than 1 step away, which makes the specification of <span class="math inline">\(W\)</span> no critical. <span class="citation" data-cites="LeSage2008">(see LeSage 2008)</span></p></li>
 <li><p>These models assume that <span class="math inline">\(W\)</span> is exogenous, in other words, if there’s homophily you won’t be able to use it!</p></li>
 <li><p>But there are solutions to this problem (using instrumental variables).</p></li>
 </ul>
